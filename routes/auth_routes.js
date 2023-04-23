@@ -1,5 +1,7 @@
 //import express, express router as shown in lecture code
 import express from "express";
+import exportedMethods from "../helpers.js";
+
 const router = express.Router();
 router.route("/").get(async (req, res) => {
   //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
@@ -23,7 +25,6 @@ router.route("/").get(async (req, res) => {
 router
   .route("/register")
   .get(async (req, res) => {
-    //code here for GET
     res.render("register", {
       title: "Login",
       emailAddressInput: "emailAddressInput",
@@ -35,7 +36,7 @@ router
   })
   .post(async (req, res) => {
     //code here for POST
-    const {
+    let {
       firstNameInput,
       lastNameInput,
       emailAddressInput,
@@ -43,6 +44,70 @@ router
       confirmPasswordInput,
       roleInput,
     } = req.body;
+
+    try {
+      firstNameInput = exportedMethods.checkString(firstNameInput);
+      firstNameInput = firstNameInput.trim();
+      if (
+        !/^[a-zA-Z]+$/.test(firstNameInput) ||
+        firstNameInput.length < 2 ||
+        firstNameInput.length > 25
+      ) {
+        return res
+          .status(400)
+          .render("signup", { error: "Please enter a valid first name." });
+      }
+    } catch (e) {
+      res.status(400).render("signup", { error: "Firstname is not entered correctly" });
+    }
+    //LastNamecheck
+    try {
+      lastNameInput = exportedMethods.checkString(lastNameInput);
+      lastNameInput = lastNameInput.trim();
+      if (
+        !/^[a-zA-Z]+$/.test(lastNameInput) ||
+        lastNameInput.length < 2 ||
+        lastNameInput.length > 25
+      ) {
+        return res
+          .status(400)
+          .render("signup", { error: "Please enter a valid last name." });
+      }
+    } catch (e) {
+      res.status(400).render("signup", { error: "LastName is not entered correctly" });
+    }
+
+    //Email Check
+    try {
+      emailAddressInput = exportedMethods.checkString(emailAddressInput);
+      emailAddressInput = emailAddressInput.trim();
+      emailAddressInput = emailAddressInput.toLowerCase();
+      if (
+        !/\S+@\S+\.\S+/.test(emailAddressInput)
+      ) {
+        return res
+          .status(400)
+          .render("signup", { error: "Please enter a valid email" });
+      }
+    } catch (e) {
+      res.status(400).render("signup", { error: "Email is not entered correctly" });
+    }
+
+    //Password Check
+     //Email Check
+     try {
+      passwordInput = exportedMethods.checkString(passwordInput);
+      passwordInput = passwordInput.trim();
+      if (
+        !/\S+@\S+\.\S+/.test(emailAddressInput)
+      ) {
+        return res
+          .status(400)
+          .render("signup", { error: "Please enter a valid email" });
+      }
+    } catch (e) {
+      res.status(400).render("signup", { error: "Email is not entered correctly" });
+    }
 
     // Check that all required fields are present
     if (
@@ -58,55 +123,51 @@ router
         .render("signup", { error: "Please fill out all fields." });
     }
 
-    // Check that firstNameInput is a valid string
-    if (
-      !/^[a-zA-Z]+$/.test(firstNameInput) ||
-      firstNameInput.length < 2 ||
-      firstNameInput.length > 25
-    ) {
-      return res
-        .status(400)
-        .render("signup", { error: "Please enter a valid first name." });
-    }
+    // // Check that firstNameInput is a valid string
+    // if (
+    //   !/^[a-zA-Z]+$/.test(firstNameInput) ||
+    //   firstNameInput.length < 2 ||
+    //   firstNameInput.length > 25
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .render("signup", { error: "Please enter a valid first name." });
+    // }
 
-    // Check that lastNameInput is a valid string
-    if (
-      !/^[a-zA-Z]+$/.test(lastNameInput) ||
-      lastNameInput.length < 2 ||
-      lastNameInput.length > 25
-    ) {
-      return res
-        .status(400)
-        .render("signup", { error: "Please enter a valid last name." });
-    }
+    // // Check that lastNameInput is a valid string
+    // if (
+    //   !/^[a-zA-Z]+$/.test(lastNameInput) ||
+    //   lastNameInput.length < 2 ||
+    //   lastNameInput.length > 25
+    // ) {
+    //   return res
+    //     .status(400)
+    //     .render("signup", { error: "Please enter a valid last name." });
+    // }
 
-    // Check that emailAddressInput is a valid email address
-    if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
-      return res
-        .status(400)
-        .render("signup", { error: "Please enter a valid email address." });
-    }
+    // // Check that emailAddressInput is a valid email address
+    // if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
+    //   return res
+    //     .status(400)
+    //     .render("signup", { error: "Please enter a valid email address." });
+    // }
 
     // Check that passwordInput meets the requirements
     if (
       !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/.test(passwordInput) ||
       passwordInput.length < 8
     ) {
-      return res
-        .status(400)
-        .render("signup", {
-          error:
-            "Please enter a valid password. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
-        });
+      return res.status(400).render("signup", {
+        error:
+          "Please enter a valid password. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      });
     }
 
     // Check that confirmPasswordInput matches passwordInput
     if (passwordInput !== confirmPasswordInput) {
-      return res
-        .status(400)
-        .render("signup", {
-          error: "Passwords do not match. Please try again.",
-        });
+      return res.status(400).render("signup", {
+        error: "Passwords do not match. Please try again.",
+      });
     }
 
     // Check that roleInput is either 'admin' or 'user'
@@ -228,7 +289,7 @@ router.route("/protected").get(async (req, res) => {
     firstName: "Login",
     currentTime: "emailAddressInput",
     role: "passwordInput",
-    admin:false
+    admin: false,
   });
 });
 
