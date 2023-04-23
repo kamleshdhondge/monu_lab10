@@ -3,13 +3,13 @@
 /*
 You will have the following middleware functions:
 
-1. This middleware will apply to the root route / and will do one of the following: If the user is authenticated AND they have a role of admin, the middleware function will redirect them to the /admin route, if the user is authenticated AND they have a role of user, you will redirect them to the /protected route. If the user is NOT authenticated, you will redirect them to the GET /login route. 
+1. This middleware will apply to the root route / and will do one of the following: If the user is authenticated AND they have a role of admin, the middleware function will redirect them to the /admin route, if the user is authenticated AND they have a role of user, you will redirect them to the /protected route. If the user is NOT authenticated, you will redirect them to the GET /login route.
 
 2. This middleware will only be used for the GET /login route and will do one of the following: If the user is authenticated AND they have a role of admin, the middleware function will redirect them to the /admin route, if the user is authenticated AND they have a role of user, you will redirect them to the /protected route. If the user is NOT authenticated, you will allow them to get through to the GET /login route. A logged in user should never be able to access the login form.
 
  3. This middleware will only be used for the GET /register route and will do one of the following: If the user is authenticated AND they have a role of admin, the middleware function will redirect them to the /admin route, if the user is authenticated AND they have a role of user, you will redirect them to the /protected route. If the user is NOT authenticated, you will allow them to get through to the GET /register route. A logged in user should never be able to access the registration form.
 
-NOTE: You could do middleware 1,2 and 3 as a single middleware if you like with just more logic to determine the route being accessed and where you need to redirect them. So you can do it as three separate middleware functions or a single one.  
+NOTE: You could do middleware 1,2 and 3 as a single middleware if you like with just more logic to determine the route being accessed and where you need to redirect them. So you can do it as three separate middleware functions or a single one.
 
 4. This middleware will only be used for the GET /protected route and will do one of the following:
 
@@ -97,7 +97,15 @@ const app = express();
 import session from 'express-session';
 import configRoutes from './routes/index.js';
 import exphbs from 'express-handlebars';
+import  path  from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, './public')
+
+app.use(express.static(publicDir))
 app.use(express.json());
 
 app.use(session({
@@ -111,7 +119,7 @@ app.use(session({
 app.use((req, res, next) => {
   // Log the timestamp, request method, and request route
   console.log(`[${new Date().toUTCString()}] ${req.method} ${req.originalUrl}`);
-  
+
   // Check if a user is authenticated and log accordingly
   if (req.session.user) {
     console.log('User is authenticated');
@@ -126,7 +134,7 @@ app.use((req, res, next) => {
 
 
   }
-  
+
   // Call the next middleware/route
 });
 */
@@ -223,7 +231,7 @@ app.use('/admin', (req, res, next) => {
   if (role !== 'admin') {
     // User does not have the necessary role, render an error view with a 403 status
     return res.status(403).render('error', {title: 'Error', error_displayed: `You do not have permission to view this page`});
-  }  
+  }
 
   // User has the necessary role, continue to the next middleware/route
   next();
@@ -267,7 +275,9 @@ app.use('/login', (req, res, next) => {
 */
 
 app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
-app.set('view engine', 'handlebars');
+//app.set('view engine', 'handlebars');
+app.set('view engine', 'handlebars')
+
 configRoutes(app);
 
 app.listen(3000, () => {
@@ -304,14 +314,14 @@ app.listen(3000, () => {
 
 
 
-/*  
+/*
 
   const app = express();
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  
+
   const static_ = express.static(__dirname + "/public");
-  
+
   import configRoutes from "./routes/index.js";
 import session from 'express-session'
 
@@ -335,11 +345,11 @@ function redirectToPage(req, res, next) {
         return res.redirect('/protected');
       }
     }
-  
+
     // If user is not authenticated, redirect to login page
     return res.redirect('/login');
   }
-  
+
   // Middleware function for preventing logged in user from accessing login page
   function preventLoginAccess(req, res, next) {
     // Check if user is authenticated
@@ -351,11 +361,11 @@ function redirectToPage(req, res, next) {
         return res.redirect('/protected');
       }
     }
-  
+
     // If user is not authenticated, allow access to login page
     return next();
   }
-  
+
   // Middleware function for preventing logged in user from accessing registration page
   function preventRegisterAccess(req, res, next) {
     // Check if user is authenticated
@@ -367,11 +377,11 @@ function redirectToPage(req, res, next) {
         return res.redirect('/protected');
       }
     }
-  
+
     // If user is not authenticated, allow access to registration page
     return next();
   }
-  
+
   // Register the middleware functions for their respective routes
   app.get('/', redirectToPage);
   app.get('/login', preventLoginAccess, (req, res) => {
@@ -386,17 +396,17 @@ function redirectToPage(req, res, next) {
   function loggingMiddleware(req, res, next) {
     // Log current timestamp, request method, and route
     console.log(`[${new Date().toUTCString()}] ${req.method} ${req.originalUrl}`);
-  
+
     // Check if user is authenticated
     const isAuthenticated = req.session.user ? true : false;
-  
+
     // Log authentication status
     console.log(`User authenticated: ${isAuthenticated}`);
-  
+
     // Call next middleware
     next();
   }
-  
+
   // Register the middleware for all routes
   app.use(loggingMiddleware);
 
