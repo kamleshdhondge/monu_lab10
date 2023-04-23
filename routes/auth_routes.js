@@ -234,18 +234,23 @@ router.route("/protected").get(async (req, res) => {
 
 router.route("/admin").get(async (req, res) => {
   //code here for GET
-  if (req.session.user.role !== "admin") {
-    res.status(403).send("Forbidden"); // User is not an admin, send 403 Forbidden error
-    return;
-  }
-
-  var currentTime = new Date().toLocaleTimeString(); // Get current time
-
-  // Render admin view with welcome message, current time, and link to protected route
   res.render("admin", {
-    firstName: req.session.user.firstName,
-    currentTime: currentTime,
+    firstName: "First Name",
+    currentTime: new Date().toLocaleTimeString(),
   });
+
+  // if (req.session.user.role !== "admin") {
+  //   res.status(403).send("Forbidden"); // User is not an admin, send 403 Forbidden error
+  //   return;
+  // }
+
+  // var currentTime = new Date().toLocaleTimeString(); // Get current time
+
+  // // Render admin view with welcome message, current time, and link to protected route
+  // res.render("admin", {
+  //   firstName: req.session.user.firstName,
+  //   currentTime: currentTime,
+  // });
 });
 
 router.route("/error").get(async (req, res) => {

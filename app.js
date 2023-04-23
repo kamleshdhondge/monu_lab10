@@ -220,23 +220,23 @@ app.use((req, res, next) => {
 // });
 
 
-// 5th middleware
-app.use('/admin', (req, res, next) => {
-  if (!req.session.user) {
-    // User is not logged in, redirect to the login page
-    return res.redirect('/login');
-  }
+// // 5th middleware
+// app.use('/admin', (req, res, next) => {
+//   if (!req.session.user) {
+//     // User is not logged in, redirect to the login page
+//     return res.redirect('/login');
+//   }
 
-  // User is logged in, check if they have the necessary role
-  const { role } = req.session.user;
-  if (role !== 'admin') {
-    // User does not have the necessary role, render an error view with a 403 status
-    return res.status(403).render('error', {title: 'Error', error_displayed: `You do not have permission to view this page`});
-  }
+//   // User is logged in, check if they have the necessary role
+//   const { role } = req.session.user;
+//   if (role !== 'admin') {
+//     // User does not have the necessary role, render an error view with a 403 status
+//     return res.status(403).render('error', {title: 'Error', error_displayed: `You do not have permission to view this page`});
+//   }
 
-  // User has the necessary role, continue to the next middleware/route
-  next();
-});
+//   // User has the necessary role, continue to the next middleware/route
+//   next();
+// });
 
 // 6th middleware
 
