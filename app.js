@@ -21,7 +21,7 @@ Users with both roles admin or user should be able to access the /protected rout
 If a user is not logged in, you will redirect to the GET /login route.
 If a user is logged in, but they are not an admin user, you will redirect to /error and render a HTML error page saying that the user does not have permission to view the page, and the page must issue an HTTP status code of 403.
 If the user is logged in AND the user has a role of admin, the middleware will "fall through" to the next route calling the next() callback.
-ONLY USERS WITH A ROLE of admin SHOULD BE ABLE TO ACCESS THE /admin ROUTE!
+ONLY USERS WITH A RfOLE of admin SHOULD BE ABLE TO ACCESS THE /admin ROUTE!
 6. This middleware will only be used for the GET /logout route and will do one of the following:
 
 1. If a user is not logged in, you will redirect to the GET /login route.
@@ -107,6 +107,7 @@ const publicDir = path.join(__dirname, './public')
 
 app.use(express.static(publicDir))
 app.use(express.json());
+app.use(express.urlencoded({extended: 'false'}))
 
 app.use(session({
   name: 'AuthCookie',
@@ -140,83 +141,83 @@ app.use((req, res, next) => {
 */
 
 
-// first middleware
-app.use('/', (req, res, next) => {
-  if (req.session && req.session.user) {
-    // Check user role
-    if (req.session.user.role === 'admin') {
-      // Redirect to admin route
-      res.redirect('/admin');
-    } else if (req.session.user.role === 'user') {
-      // Redirect to protected route
-      res.redirect('/protected');
-    }
-  } else {
-    // User is not authenticated, redirect to login route
-    console.log("redirecting")
-    return res.redirect('/login');
-  }
-});
+// // first middleware
+// app.use('/', (req, res, next) => {
+//   if (req.session && req.session.user) {
+//     // Check user role
+//     if (req.session.user.role === 'admin') {
+//       // Redirect to admin route
+//       res.redirect('/admin');
+//     } else if (req.session.user.role === 'user') {
+//       // Redirect to protected route
+//       res.redirect('/protected');
+//     }
+//   } else {
+//     // User is not authenticated, redirect to login route
+//     console.log("redirecting")
+//     return res.redirect('/login');
+//   }
+// });
 
 
-// second middleware
-app.use('/login', (req, res, next) => {
-  console.log("i am in login route ")
+// // second middleware
+// app.use('/login', (req, res, next) => {
+//   console.log("i am in login route ")
 
-  if (req.session && req.session.user) {
-    // Check user role
-    if (req.session.user.role === 'admin') {
-      // Redirect to admin route
-      res.redirect('/admin');
-    } else if (req.session.user.role === 'user') {
-      // Redirect to protected route
-      res.redirect('/protected');
-    }
-  } else {
-    // User is not authenticated, redirect to login route
-    console.log("i am hereeeeeeeeeeeeeee")
+//   if (req.session && req.session.user) {
+//     // Check user role
+//     if (req.session.user.role === 'admin') {
+//       // Redirect to admin route
+//       res.redirect('/admin');
+//     } else if (req.session.user.role === 'user') {
+//       // Redirect to protected route
+//       res.redirect('/protected');
+//     }
+//   } else {
+//     // User is not authenticated, redirect to login route
+//     console.log("i am hereeeeeeeeeeeeeee")
 
-    res.render('login');
-  }
-  return res.json({error: 'YOU SHOULD NOT BE HERE!'});
-});
+//     res.render('login');
+//   }
+//   return res.json({error: 'YOU SHOULD NOT BE HERE!'});
+// });
 
 // third middleware
-app.use('/register', (req, res, next) => {
-  if (req.session.user) {
-      // If user is authenticated, redirect to protected route
-      if (req.session.user.role === 'user') {
-        res.redirect('/protected');
-      }
-      // If user is authenticated as admin, redirect to admin route
-      else if (req.session.user.role === 'admin') {
-        res.redirect('/admin');
-      }
-    }
-    else {
-      // If user is not authenticated, render registration form
-      res.redirect('/register');
-    }
-});
+// app.use('/register', (req, res, next) => {
+//   if (req.session.user) {
+//       // If user is authenticated, redirect to protected route
+//       if (req.session.user.role === 'user') {
+//         res.redirect('/protected');
+//       }
+//       // If user is authenticated as admin, redirect to admin route
+//       else if (req.session.user.role === 'admin') {
+//         res.redirect('/admin');
+//       }
+//     }
+//     else {
+//       // If user is not authenticated, render registration form
+//       res.redirect('/register');
+//     }
+// });
 
 // fourth middleware
 
-app.use('/protected', (req, res, next) => {
-  if (!req.session.user) {
-    // User is not logged in, redirect to the login page
-    return res.redirect('/login');
-  }
+// app.use('/protected', (req, res, next) => {
+//   if (!req.session.user) {
+//     // User is not logged in, redirect to the login page
+//     return res.redirect('/login');
+//   }
 
-  // User is logged in, check if they have the necessary role
-  const { role } = req.session.user;
-  if (role !== 'admin' && role !== 'user') {
-    // User does not have the necessary role, respond with a 403 Forbidden status
-    return res.status(403).send('Access denied');
-  }
+//   // User is logged in, check if they have the necessary role
+//   const { role } = req.session.user;
+//   if (role !== 'admin' && role !== 'user') {
+//     // User does not have the necessary role, respond with a 403 Forbidden status
+//     return res.status(403).send('Access denied');
+//   }
 
-  // User has the necessary role, continue to the next middleware/route
-  next();
-});
+//   // User has the necessary role, continue to the next middleware/route
+//   next();
+// });
 
 
 // 5th middleware

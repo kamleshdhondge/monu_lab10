@@ -3,7 +3,21 @@
 login form handlebar template
 
 --}}
+{{!-- Old Code --}}
+{{!-- <h1>Login</h1>
+    <form id="login-form" method="POST" action="/login">
+      <label for="emailAddressInput">Email Address:</label>
+      <input type="email" name="emailAddressInput" id="emailAddressInput">
+      <br>
+      <label for="passwordInput">Password:</label>
+      <input type="password" name="passwordInput" id="passwordInput">
+      <br>
+      <input type="submit" value="Login">
+    </form>
+    <p>Don't have an account? <a href="/register">Click here to register!</a></p>
+     --}}
 
+{{!-- New COde --}}
 <h1>Login</h1>
     <form id="login-form" method="POST" action="/login">
       <label for="emailAddressInput">Email Address:</label>
@@ -15,4 +29,3 @@ login form handlebar template
       <input type="submit" value="Login">
     </form>
     <p>Don't have an account? <a href="/register">Click here to register!</a></p>
-    
