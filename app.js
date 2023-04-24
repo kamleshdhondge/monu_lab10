@@ -48,8 +48,8 @@ An example would be:
 
 */
 
-import {dbConnection, closeConnection} from './config/mongoConnection.js';
-import * as postData from './data/users.js';
+import { dbConnection, closeConnection } from "./config/mongoConnection.js";
+import * as postData from "./data/users.js";
 //lets drop the database each time this is run
 
 /*
@@ -84,7 +84,7 @@ try {
   await closeConnection();
   console.log('Done');
   */
-  /*import express from "express";
+/*import express from "express";
   import {fileURLToPath} from 'url';
   import {dirname} from 'path';
   import exphbs from 'express-handlebars';
@@ -92,29 +92,31 @@ try {
 
 */
 
-import express from 'express';
+import express from "express";
 const app = express();
-import session from 'express-session';
-import configRoutes from './routes/index.js';
-import exphbs from 'express-handlebars';
-import  path  from 'path';
-import { fileURLToPath } from 'url';
+import session from "express-session";
+import configRoutes from "./routes/index.js";
+import exphbs from "express-handlebars";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
-const publicDir = path.join(__dirname, './public')
+const publicDir = path.join(__dirname, "./public");
 
-app.use(express.static(publicDir))
+app.use(express.static(publicDir));
 app.use(express.json());
-app.use(express.urlencoded({extended: 'false'}))
+app.use(express.urlencoded({ extended: "false" }));
 
-app.use(session({
-  name: 'AuthCookie',
-  secret: 'some secret string!',
-  resave: false,
-  saveUninitialized: false
-}))
+app.use(
+  session({
+    name: "AuthCookie",
+    secret: "some secret string!",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 /*
 app.use((req, res, next) => {
@@ -140,7 +142,6 @@ app.use((req, res, next) => {
 });
 */
 
-
 // // first middleware
 // app.use('/', (req, res, next) => {
 //   if (req.session && req.session.user) {
@@ -158,7 +159,6 @@ app.use((req, res, next) => {
 //     return res.redirect('/login');
 //   }
 // });
-
 
 // // second middleware
 // app.use('/login', (req, res, next) => {
@@ -219,7 +219,6 @@ app.use((req, res, next) => {
 //   next();
 // });
 
-
 // // 5th middleware
 // app.use('/admin', (req, res, next) => {
 //   if (!req.session.user) {
@@ -240,6 +239,7 @@ app.use((req, res, next) => {
 
 // 6th middleware
 
+/*
 app.use('/logout', (req, res, next) => {
   if (!req.session.user) {
     // User is not logged in, redirect to the login page
@@ -275,45 +275,16 @@ app.use('/login', (req, res, next) => {
 
 */
 
-app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
+app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
 //app.set('view engine', 'handlebars');
-app.set('view engine', 'handlebars')
+app.set("view engine", "handlebars");
 
 configRoutes(app);
 
 app.listen(3000, () => {
   console.log("We've now got a server!");
-  console.log('Your routes will be running on http://localhost:3000');
+  console.log("Your routes will be running on http://localhost:3000");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 
