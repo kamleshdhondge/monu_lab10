@@ -123,7 +123,6 @@ router
         .status(400)
         .render("register", { error: "Please select a valid role." });
     }
-    console.log("Creating in DB");
     // Call your createUser function and pass in the fields from the request.body
     createUser({
       firstNameInput,

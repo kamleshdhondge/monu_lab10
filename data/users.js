@@ -5,13 +5,13 @@ import bcrypt from 'bcrypt';
 import exportedMethods from '../helpers.js';
 import validation from '../helpers.js';
 
-export const createUser = async (
+export const createUser = async ({
   firstNameInput,
   lastNameInput,
   emailAddressInput,
   passwordInput,
   roleInput
-) => {
+}) => {
   let resultObj = {
      insertedUser: false,
      errorMessage: ""
@@ -29,7 +29,8 @@ export const createUser = async (
       return resultObj;
     }
   } catch (e) {
-    resultObj.errorMessage= "First Name is not in valid format in Exp";
+    console.log(e);
+    resultObj.errorMessage= "First Name is not in valid format in Exp" ;
     return resultObj;
 
   }
@@ -81,19 +82,45 @@ export const createUser = async (
     return resultObj;
     }
 
-   // Check that confirmPasswordInput matches passwordInput
-   if (passwordInput !== confirmPasswordInput) {
-    return res.status(400).render("register", {
-      error: "Passwords do not match. Please try again.",
-    });
-  }
    roleInput = roleInput.toLowerCase();
   // Check that roleInput is either 'admin' or 'user'
   if (roleInput !== "admin" && roleInput !== "user") {
     resultObj.errorMessage= "Role is not in valid format";
     return resultObj;
   }
+  const db = await users();
+  const existingUser = await db.findOne({ emailAddress: emailAddressInput });
+  if (existingUser) {
+    resultObj.errorMessage= "User with same email already exits";
+    return resultObj;
+    //throw new Error('A user with this email address already exists');
+  }
+  const hashedPassword = await bcrypt.hash(passwordInput, 10);
 
+  // Check role
+  const lowercaseRole = roleInput.toLowerCase();
+  if (lowercaseRole !== 'admin' && lowercaseRole !== 'user') {
+    resultObj.errorMessage='Role should be either "admin" or "user"';
+    return resultObj;
+    // throw new Error('Role should be either "admin" or "user"');
+  }
+
+  // Insert the user into the database
+  const result = await db.insertOne({
+    _id: new ObjectId(),
+    firstName: firstNameInput,
+    lastName: lastNameInput,
+    emailAddress: emailAddressInput,
+    password: passwordInput,
+    role: roleInput
+  });
+
+  if (result.acknowledged) {
+    return { insertedUser: true, errorMessage: "" };
+  } else {
+
+    throw new Error('User could not be inserted');
+  }
 
 
   // // Check first name
@@ -118,13 +145,6 @@ export const createUser = async (
   // const lowercaseEmail = emailAddress.toLowerCase();
 
   // Check if email already exists in the database
-  const db = await users();
-  const existingUser = await db.findOne({ emailAddress: emailAddressInput });
-  if (existingUser) {
-    resultObj.errorMessage= "User with same email already exits";
-    return resultObj;
-    //throw new Error('A user with this email address already exists');
-  }
 
   // // Check password format
   // const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
@@ -133,31 +153,7 @@ export const createUser = async (
   // }
 
   // Hash the password using bcrypt
-  const hashedPassword = await bcrypt.hash(passwordInput, 10);
 
-  // Check role
-  const lowercaseRole = roleInput.toLowerCase();
-  if (lowercaseRole !== 'admin' && lowercaseRole !== 'user') {
-    resultObj.errorMessage='Role should be either "admin" or "user"';
-    return resultObj;
-    // throw new Error('Role should be either "admin" or "user"');
-  }
-
-  // Insert the user into the database
-  const result = await db.insertOne({
-    _id: new ObjectId(),
-    firstNameInput,
-    lastNameInput,
-    emailAddressInput: lowercaseEmail,
-    passwordInput: hashedPassword,
-    roleInput: lowercaseRole
-  });
-
-  if (result.insertedCount === 1) {
-    return { insertedUser: true, errorMessage: "" };
-  } else {
-    throw new Error('User could not be inserted');
-  }
 
 };
 
