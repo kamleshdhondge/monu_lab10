@@ -29,7 +29,7 @@ export const createUser = async ({
       return resultObj;
     }
   } catch (e) {
-    console.log(e);
+
     resultObj.errorMessage = "First Name is not in valid format in Exp";
     return resultObj;
   }

@@ -4,24 +4,6 @@ import exportedMethods from "../helpers.js";
 import { createUser,checkUser } from "../data/users.js";
 
 const router = express.Router();
-router.route("/").get(async (req, res) => {
-  //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
-  console.log("coming here");
-  if (req.session && req.session.user) {
-    // Check user role
-    if (req.session.user.role === "admin") {
-      // Redirect to admin route
-      res.redirect("/admin");
-    } else if (req.session.user.role === "user") {
-      // Redirect to protected route
-      res.redirect("/protected");
-    }
-  } else {
-    // User is not authenticated, redirect to login route
-    res.redirect("/login");
-  }
-  return res.json({ error: "YOU SHOULD NOT BE HERE!" });
-});
 
 router
   .route("/register")
@@ -142,7 +124,6 @@ router
           // If the createUser function was successful, redirect the user to the /login page
           return res.redirect("/login");
         } else {
-          console.log("Insert ", result);
           // What user entered incorrectly
           return res
             .status(400)
@@ -151,7 +132,6 @@ router
       })
       .catch((error) => {
         // Server error
-        console.log(error);
         return res
           .status(500)
           .render("register", { error: "Internal Server Error" });
@@ -268,13 +248,13 @@ router
         // Set AuthCookie and session.user
         res.cookie("AuthCookie");
         req.session.user = {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          emailAddress: user.emailAddressInput,
-          role: user.role,
+          firstName: user.user.firstName,
+          lastName: user.user.lastName,
+          emailAddress: user.user.emailAddress,
+          role: user.user.role,
         };
         // Redirect based on user role
-        if (user.role === "admin") {
+        if (user.user.role === "admin") {
           return res.redirect("/admin");
         } else {
           return res.redirect("/protected");
@@ -296,46 +276,32 @@ router
 
 router.route("/protected").get(async (req, res) => {
   //code here for GET
-  // const { firstName, role } = req.session.user;
-  // const currentTime = new Date().toLocaleTimeString();
+  const { firstName, role } = req.session.user;
 
-  // let message = `Welcome ${firstName}, the time is now: ${currentTime}. Your role in the system is: ${role}.`;
-  // if (role === "admin") {
-  //   message += ` <a href="/admin">Admin Page</a>`;
-  // }
-
-  // message += ` <a href="/logout">Logout</a>`;
-
-  // res.send(message);
 
   //New Code
-  res.render("protected", {
-    firstName: "Login",
-    currentTime: "emailAddressInput",
-    role: "passwordInput",
+  return res.render("protected", {
+    firstName: firstName,
+    currentTime: new Date().toUTCString(),
+    role: role,
     admin: false,
   });
 });
 
 router.route("/admin").get(async (req, res) => {
   //code here for GET
+
+  if (req.session.user.role !== "admin") {
+    res.status(403).send("Forbidden"); // User is not an admin, send 403 Forbidden error
+    return;
+  }
+
+
+
   res.render("admin", {
-    firstName: "First Name",
+    firstName: req.session.user.firstName,
     currentTime: new Date().toLocaleTimeString(),
   });
-
-  // if (req.session.user.role !== "admin") {
-  //   res.status(403).send("Forbidden"); // User is not an admin, send 403 Forbidden error
-  //   return;
-  // }
-
-  // var currentTime = new Date().toLocaleTimeString(); // Get current time
-
-  // // Render admin view with welcome message, current time, and link to protected route
-  // res.render("admin", {
-  //   firstName: req.session.user.firstName,
-  //   currentTime: currentTime,
-  // });
 });
 
 router.route("/error").get(async (req, res) => {
@@ -345,14 +311,11 @@ router.route("/error").get(async (req, res) => {
 
 router.route("/logout").get(async (req, res) => {
   //code here for GET
-  res.clearCookie("AuthCookie");
+  // res.clearCookie("AuthCookie");
+  req.session.destroy();
 
   // Redirect the user to the home page and inform them that they have been logged out
-  res
-    .status(200)
-    .send(
-      "You have been logged out. <a href='/'>Click here to return to the homepage</a>."
-    );
+  res.render("logout");
 });
 
 export default router;
