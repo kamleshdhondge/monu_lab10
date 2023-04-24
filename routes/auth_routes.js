@@ -222,9 +222,8 @@ router
     });
   })
   .post(async (req, res) => {
-    const { emailAddressInput, passwordInput } = req.body;
+    let { emailAddressInput, passwordInput } = req.body;
     //Email Check
-    console.log(req.body);
 
     try {
       emailAddressInput = exportedMethods.checkString(emailAddressInput);
@@ -234,13 +233,12 @@ router
       if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
         return res
           .status(400)
-          .render("login", { errorMessage: "Email  is not entered correctly" });
+          .render("login", { errorMessage: "Email or password is not  correct" });
       }
     } catch (e) {
-      console.log(e);
       return res
         .status(400)
-        .render("login", { errorMessage: "Email  is not entered correctly" });
+        .render("login", { errorMessage: "Email or password is not  correct" });
     }
 
     //Password Check
@@ -254,20 +252,19 @@ router
       ) {
         return res
           .status(400)
-          .render("login", { errorMessage: "Email or Password is not in correct format" });
+          .render("login", { errorMessage: "Email or Password is not  correct" });
       }
     } catch (e) {
       return res
         .status(400)
-        .render("login", { errorMessage: "Email or Password is not in correct format" });
+        .render("login", { errorMessage: "Email or Password is not  correct " });
     }
 
     // Make email address case-insensitive
     const emailAddress = emailAddressInput.toLowerCase();
     try {
       const user = await checkUser(emailAddress, passwordInput);
-      console.log("User ", user);
-      if (user) {
+      if (user.isUserFound) {
         // Set AuthCookie and session.user
         res.cookie("AuthCookie");
         req.session.user = {
@@ -289,8 +286,9 @@ router
         });
       }
     } catch (error) {
+
       // DB function error
-      return res.status(400).render("login", {
+      return res.status(500).render("login", {
         errorMessage: "An error occurred. Please try again later.",
       });
     }

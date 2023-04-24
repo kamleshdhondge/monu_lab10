@@ -153,18 +153,23 @@ export const createUser = async ({
 export const checkUser = async (emailAddressInput, passwordInput) => {
 
   // Normalize emailAddress to lowercase
-
+  let resultObj = {
+    user: false,
+    isUserFound:false,
+    errorMessage: "",
+  };
   //Email Check
   try {
     emailAddressInput = exportedMethods.checkString(emailAddressInput);
     emailAddressInput = emailAddressInput.trim();
     emailAddressInput = emailAddressInput.toLowerCase();
     if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
-      throw new Error("Email is not in valid format");
+      resultObj.errorMessage = "Email or password is not correct";
+      return resultObj;
     }
   } catch (e) {
-    throw new Error("Email is not in valid format");
-
+    resultObj.errorMessage = "Email or password is not correct";
+    return resultObj;
   }
 
 
@@ -181,7 +186,6 @@ export const checkUser = async (emailAddressInput, passwordInput) => {
   //   throw new Error( "Password is not in valid format");
 
   // }
-  console.log("DB Users");
 
 
   emailAddressInput = emailAddressInput.toLowerCase();
@@ -192,20 +196,24 @@ export const checkUser = async (emailAddressInput, passwordInput) => {
 
   // If user is not found, throw an error
   if (!user) {
-    throw new Error("Either the email address or password is invalid");
+    resultObj.errorMessage = "Email or password is not correct";
+    return resultObj;
   }
 
   // Use bcrypt to compare the hashed password in the database with the password input parameter
   const match = await bcrypt.compare(passwordInput, user.password);
   if (!match) {
-    throw new Error("Either the email address or password is invalid");
+    resultObj.errorMessage = "Email or password is not correct";
+    return resultObj;
   }
 
   // If passwords match, return the following fields of the user
-  return {
+  resultObj.user =  {
     firstName: user.firstName,
     lastName: user.lastName,
     emailAddress: user.emailAddress,
     role: user.role,
   };
+  resultObj.isUserFound = true;
+  return resultObj;
 };
