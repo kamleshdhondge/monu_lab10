@@ -1,7 +1,7 @@
 //import express, express router as shown in lecture code
 import express from "express";
 import exportedMethods from "../helpers.js";
-import {createUser} from '../data/users.js';
+import { createUser,checkUser } from "../data/users.js";
 
 const router = express.Router();
 router.route("/").get(async (req, res) => {
@@ -36,8 +36,6 @@ router
     });
   })
   .post(async (req, res) => {
-    //code here for POST
-    console.log(req.body);
     let {
       firstNameInput,
       lastNameInput,
@@ -60,7 +58,9 @@ router
           .render("register", { error: "Please enter a valid first name." });
       }
     } catch (e) {
-      res.status(400).render("register", { error: "Firstname is not entered correctly" });
+      res
+        .status(400)
+        .render("register", { error: "Firstname is not entered correctly" });
     }
     //LastNamecheck
     try {
@@ -76,7 +76,9 @@ router
           .render("register", { error: "Please enter a valid last name." });
       }
     } catch (e) {
-      res.status(400).render("register", { error: "LastName is not entered correctly" });
+      res
+        .status(400)
+        .render("register", { error: "LastName is not entered correctly" });
     }
 
     //Email Check
@@ -84,34 +86,38 @@ router
       emailAddressInput = exportedMethods.checkString(emailAddressInput);
       emailAddressInput = emailAddressInput.trim();
       emailAddressInput = emailAddressInput.toLowerCase();
-      if (
-        !/\S+@\S+\.\S+/.test(emailAddressInput)
-      ) {
+      if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
         return res
           .status(400)
           .render("register", { error: "Please enter a valid email" });
       }
     } catch (e) {
-      res.status(400).render("register", { error: "Email is not entered correctly" });
+      res
+        .status(400)
+        .render("register", { error: "Email is not entered correctly" });
     }
 
     //Password Check
-     try {
+    try {
       passwordInput = exportedMethods.checkString(passwordInput);
       passwordInput = passwordInput.trim();
       if (
-        !/^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/gm.test(passwordInput)
+        !/^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/gm.test(
+          passwordInput
+        )
       ) {
         return res
           .status(400)
           .render("register", { error: "Password is not in correct format" });
       }
     } catch (e) {
-      res.status(400).render("register", { error: "Password is not in correct format" });
+      res
+        .status(400)
+        .render("register", { error: "Password is not in correct format" });
     }
 
-     // Check that confirmPasswordInput matches passwordInput
-     if (passwordInput !== confirmPasswordInput) {
+    // Check that confirmPasswordInput matches passwordInput
+    if (passwordInput !== confirmPasswordInput) {
       return res.status(400).render("register", {
         error: "Passwords do not match. Please try again.",
       });
@@ -146,114 +152,130 @@ router
       .catch((error) => {
         // Server error
         console.log(error);
-        return res.status(500).render("register", { error: "Internal Server Error" });
+        return res
+          .status(500)
+          .render("register", { error: "Internal Server Error" });
       });
   });
 
-    // // Check that all required fields are present
-    // if (
-    //   !firstNameInput ||
-    //   !lastNameInput ||
-    //   !emailAddressInput ||
-    //   !passwordInput ||
-    //   !confirmPasswordInput ||
-    //   !roleInput
-    // ) {
-    //   return res
-    //     .status(400)
-    //     .render("register", { error: "Please fill out all fields." });
-    // }
+// // Check that all required fields are present
+// if (
+//   !firstNameInput ||
+//   !lastNameInput ||
+//   !emailAddressInput ||
+//   !passwordInput ||
+//   !confirmPasswordInput ||
+//   !roleInput
+// ) {
+//   return res
+//     .status(400)
+//     .render("register", { error: "Please fill out all fields." });
+// }
 
-    // // Check that firstNameInput is a valid string
-    // if (
-    //   !/^[a-zA-Z]+$/.test(firstNameInput) ||
-    //   firstNameInput.length < 2 ||
-    //   firstNameInput.length > 25
-    // ) {
-    //   return res
-    //     .status(400)
-    //     .render("register", { error: "Please enter a valid first name." });
-    // }
+// // Check that firstNameInput is a valid string
+// if (
+//   !/^[a-zA-Z]+$/.test(firstNameInput) ||
+//   firstNameInput.length < 2 ||
+//   firstNameInput.length > 25
+// ) {
+//   return res
+//     .status(400)
+//     .render("register", { error: "Please enter a valid first name." });
+// }
 
-    // // Check that lastNameInput is a valid string
-    // if (
-    //   !/^[a-zA-Z]+$/.test(lastNameInput) ||
-    //   lastNameInput.length < 2 ||
-    //   lastNameInput.length > 25
-    // ) {
-    //   return res
-    //     .status(400)
-    //     .render("register", { error: "Please enter a valid last name." });
-    // }
+// // Check that lastNameInput is a valid string
+// if (
+//   !/^[a-zA-Z]+$/.test(lastNameInput) ||
+//   lastNameInput.length < 2 ||
+//   lastNameInput.length > 25
+// ) {
+//   return res
+//     .status(400)
+//     .render("register", { error: "Please enter a valid last name." });
+// }
 
-    // // Check that emailAddressInput is a valid email address
-    // if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
-    //   return res
-    //     .status(400)
-    //     .render("register", { error: "Please enter a valid email address." });
-    // }
+// // Check that emailAddressInput is a valid email address
+// if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
+//   return res
+//     .status(400)
+//     .render("register", { error: "Please enter a valid email address." });
+// }
 
-    // // Check that passwordInput meets the requirements
-    // if (
-    //   !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/.test(passwordInput) ||
-    //   passwordInput.length < 8
-    // ) {
-    //   return res.status(400).render("register", {
-    //     error:
-    //       "Please enter a valid password. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
-    //   });
-    // }
-
-
+// // Check that passwordInput meets the requirements
+// if (
+//   !/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/.test(passwordInput) ||
+//   passwordInput.length < 8
+// ) {
+//   return res.status(400).render("register", {
+//     error:
+//       "Please enter a valid password. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+//   });
+// }
 
 router
   .route("/login")
   .get(async (req, res) => {
-    //code here for GET
-    console.log("inside login route here");
     res.render("login", {
       title: "Login",
-      emailId: "emailAddressInput",
-      passwordId: "passwordInput",
+      emailAddressInput: "emailAddressInput",
+      passwordInput: "passwordInput",
     });
   })
   .post(async (req, res) => {
-    //code here for POST
     const { emailAddressInput, passwordInput } = req.body;
+    //Email Check
+    console.log(req.body);
 
-    // Validate email address format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailAddressInput)) {
-      return res.status(400).render("login", {
-        errorMessage: "Please enter a valid email address",
-      });
+    try {
+      emailAddressInput = exportedMethods.checkString(emailAddressInput);
+      emailAddressInput = emailAddressInput.trim();
+      emailAddressInput = emailAddressInput.toLowerCase();
+
+      if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
+        return res
+          .status(400)
+          .render("login", { errorMessage: "Email  is not entered correctly" });
+      }
+    } catch (e) {
+      console.log(e);
+      return res
+        .status(400)
+        .render("login", { errorMessage: "Email  is not entered correctly" });
     }
 
-    // Validate password format and length
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/;
-    if (!passwordRegex.test(passwordInput)) {
-      return res.status(400).render("login", {
-        errorMessage:
-          "Please enter a password with at least 8 characters, one uppercase letter, one number, and one special character",
-      });
+    //Password Check
+    try {
+      passwordInput = exportedMethods.checkString(passwordInput);
+      passwordInput = passwordInput.trim();
+      if (
+        !/^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/gm.test(
+          passwordInput
+        )
+      ) {
+        return res
+          .status(400)
+          .render("login", { errorMessage: "Email or Password is not in correct format" });
+      }
+    } catch (e) {
+      return res
+        .status(400)
+        .render("login", { errorMessage: "Email or Password is not in correct format" });
     }
 
     // Make email address case-insensitive
     const emailAddress = emailAddressInput.toLowerCase();
-
     try {
       const user = await checkUser(emailAddress, passwordInput);
+      console.log("User ", user);
       if (user) {
         // Set AuthCookie and session.user
-        res.cookie("AuthCookie", "someAuthTokenHere");
+        res.cookie("AuthCookie");
         req.session.user = {
           firstName: user.firstName,
           lastName: user.lastName,
-          emailAddress: user.emailAddress,
+          emailAddress: user.emailAddressInput,
           role: user.role,
         };
-
         // Redirect based on user role
         if (user.role === "admin") {
           return res.redirect("/admin");

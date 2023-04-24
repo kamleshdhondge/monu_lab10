@@ -1,20 +1,20 @@
 //import mongo collections, bcrypt and implement the following data functions
-import {ObjectId} from 'mongodb';
-import {users} from '../config/mongoCollections.js'
-import bcrypt from 'bcrypt';
-import exportedMethods from '../helpers.js';
-import validation from '../helpers.js';
+import { ObjectId } from "mongodb";
+import { users } from "../config/mongoCollections.js";
+import bcrypt from "bcrypt";
+import exportedMethods from "../helpers.js";
+import validation from "../helpers.js";
 
 export const createUser = async ({
   firstNameInput,
   lastNameInput,
   emailAddressInput,
   passwordInput,
-  roleInput
+  roleInput,
 }) => {
   let resultObj = {
-     insertedUser: false,
-     errorMessage: ""
+    insertedUser: false,
+    errorMessage: "",
   };
 
   try {
@@ -25,14 +25,13 @@ export const createUser = async ({
       firstNameInput.length < 2 ||
       firstNameInput.length > 25
     ) {
-      resultObj.errorMessage= "First Name is not in valid format";
+      resultObj.errorMessage = "First Name is not in valid format";
       return resultObj;
     }
   } catch (e) {
     console.log(e);
-    resultObj.errorMessage= "First Name is not in valid format in Exp" ;
+    resultObj.errorMessage = "First Name is not in valid format in Exp";
     return resultObj;
-
   }
   //LastNamecheck
   try {
@@ -43,11 +42,11 @@ export const createUser = async ({
       lastNameInput.length < 2 ||
       lastNameInput.length > 25
     ) {
-      resultObj.errorMessage= "Last Name is not in valid format";
+      resultObj.errorMessage = "Last Name is not in valid format";
       return resultObj;
     }
   } catch (e) {
-    resultObj.errorMessage= "Last Name is not in valid format";
+    resultObj.errorMessage = "Last Name is not in valid format";
     return resultObj;
   }
 
@@ -56,42 +55,40 @@ export const createUser = async ({
     emailAddressInput = exportedMethods.checkString(emailAddressInput);
     emailAddressInput = emailAddressInput.trim();
     emailAddressInput = emailAddressInput.toLowerCase();
-    if (
-      !/\S+@\S+\.\S+/.test(emailAddressInput)
-    ) {
-      resultObj.errorMessage= "Email is not in valid format";
+    if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
+      resultObj.errorMessage = "Email is not in valid format";
       return resultObj;
     }
   } catch (e) {
-    resultObj.errorMessage= "Email is not in valid format";
+    resultObj.errorMessage = "Email is not in valid format";
     return resultObj;
   }
 
   //Password Check
-   try {
+  try {
     passwordInput = exportedMethods.checkString(passwordInput);
     passwordInput = passwordInput.trim();
     if (
       !/^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(passwordInput)
     ) {
-      resultObj.errorMessage= "Password is not in valid format";
+      resultObj.errorMessage = "Password is not in valid format";
       return resultObj;
     }
   } catch (e) {
-    resultObj.errorMessage= "Password is not in valid format";
+    resultObj.errorMessage = "Password is not in valid format";
     return resultObj;
-    }
+  }
 
-   roleInput = roleInput.toLowerCase();
+  roleInput = roleInput.toLowerCase();
   // Check that roleInput is either 'admin' or 'user'
   if (roleInput !== "admin" && roleInput !== "user") {
-    resultObj.errorMessage= "Role is not in valid format";
+    resultObj.errorMessage = "Role is not in valid format";
     return resultObj;
   }
   const db = await users();
   const existingUser = await db.findOne({ emailAddress: emailAddressInput });
   if (existingUser) {
-    resultObj.errorMessage= "User with same email already exits";
+    resultObj.errorMessage = "User with same email already exits";
     return resultObj;
     //throw new Error('A user with this email address already exists');
   }
@@ -99,8 +96,8 @@ export const createUser = async ({
 
   // Check role
   const lowercaseRole = roleInput.toLowerCase();
-  if (lowercaseRole !== 'admin' && lowercaseRole !== 'user') {
-    resultObj.errorMessage='Role should be either "admin" or "user"';
+  if (lowercaseRole !== "admin" && lowercaseRole !== "user") {
+    resultObj.errorMessage = 'Role should be either "admin" or "user"';
     return resultObj;
     // throw new Error('Role should be either "admin" or "user"');
   }
@@ -111,17 +108,15 @@ export const createUser = async ({
     firstName: firstNameInput,
     lastName: lastNameInput,
     emailAddress: emailAddressInput,
-    password: passwordInput,
-    role: roleInput
+    password: hashedPassword,
+    role: roleInput,
   });
 
   if (result.acknowledged) {
     return { insertedUser: true, errorMessage: "" };
   } else {
-
-    throw new Error('User could not be inserted');
+    throw new Error("User could not be inserted");
   }
-
 
   // // Check first name
   // const firstNameRegex = /^[A-Za-z]+$/;
@@ -153,41 +148,47 @@ export const createUser = async ({
   // }
 
   // Hash the password using bcrypt
-
-
 };
 
-export const checkUser = async (emailAddress, password) => {
-  if (!emailAddress || !password) {
-    throw new Error("Both emailAddress and password must be supplied");
-  }
-
-  // Check if emailAddress is a valid email address format
-  if (!/[^@]+@[^@]+\.[^@]+/.test(emailAddress)) {
-    throw new Error("emailAddress should be a valid email address format");
-  }
+export const checkUser = async (emailAddressInput, passwordInput) => {
 
   // Normalize emailAddress to lowercase
-  emailAddress = emailAddress.toLowerCase();
 
-  // Check if password is valid
-  if (password.length < 8 || /\s/.test(password)) {
-    throw new Error("Password should be at least 8 characters long and not contain spaces");
-  }
-  if (!/[A-Z]/.test(password)) {
-    throw new Error("Password should contain at least one uppercase character");
-  }
-  if (!/\d/.test(password)) {
-    throw new Error("Password should contain at least one number");
-  }
-  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(password)) {
-    throw new Error("Password should contain at least one special character");
+  //Email Check
+  try {
+    emailAddressInput = exportedMethods.checkString(emailAddressInput);
+    emailAddressInput = emailAddressInput.trim();
+    emailAddressInput = emailAddressInput.toLowerCase();
+    if (!/\S+@\S+\.\S+/.test(emailAddressInput)) {
+      throw new Error("Email is not in valid format");
+    }
+  } catch (e) {
+    throw new Error("Email is not in valid format");
+
   }
 
+
+  // //Password Check
+  // try {
+  //   passwordInput = exportedMethods.checkString(passwordInput);
+  //   passwordInput = passwordInput.trim();
+  //   if (
+  //     !/^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(passwordInput)
+  //   ) {
+  //     throw new Error("Password is not in valid format");
+  //   }
+  // } catch (e) {
+  //   throw new Error( "Password is not in valid format");
+
+  // }
+  console.log("DB Users");
+
+
+  emailAddressInput = emailAddressInput.toLowerCase();
   // Query the database for the emailAddress
   const db = await users();
 
-  const user = await db.findOne({ emailAddress: emailAddress });
+  const user = await db.findOne({ emailAddress: emailAddressInput });
 
   // If user is not found, throw an error
   if (!user) {
@@ -195,7 +196,7 @@ export const checkUser = async (emailAddress, password) => {
   }
 
   // Use bcrypt to compare the hashed password in the database with the password input parameter
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(passwordInput, user.password);
   if (!match) {
     throw new Error("Either the email address or password is invalid");
   }
