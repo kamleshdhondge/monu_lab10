@@ -278,9 +278,13 @@ app.use('/login', (req, res, next) => {
 app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
 //app.set('view engine', 'handlebars');
 app.set("view engine", "handlebars");
+const customLogger = function (req, res, next) {
+  console.log(new Date().toUTCString(), ': ',req.method,' ', req.orignalUrl, 'KD' );
+  next();
+}
 
 configRoutes(app);
-
+app.use('/register',customLogger);
 app.listen(3000, () => {
   console.log("We've now got a server!");
   console.log("Your routes will be running on http://localhost:3000");

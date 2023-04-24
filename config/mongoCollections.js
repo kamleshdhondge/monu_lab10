@@ -15,7 +15,7 @@ const getCollectionFn = (collection) => {
   };
 };
 
-/* Now, you can list your collections here: 
+/* Now, you can list your collections here:
 NOTE: YOU WILL NEED TO CHANGE THE CODE BELOW AND UNCOMMENT IT TO HAVE THE COLLECTION(S) REQUIRED BY THE ASSIGNMENT */
 
-export const posts = getCollectionFn('users');
+export const users = getCollectionFn('users');
