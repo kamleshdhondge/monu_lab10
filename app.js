@@ -100,6 +100,7 @@ app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
 //app.set('view engine', 'handlebars');
 app.set("view engine", "handlebars");
 const customLogger = function (req, res, next) {
+  let isloggedIn = (req.session && req.session.user) ? true : false;
   console.log(
     new Date().toUTCString(),
     ": ",
@@ -107,7 +108,7 @@ const customLogger = function (req, res, next) {
     " ",
     req.originalUrl,
     "Is user Logged in:",
-    req.session && req.session.user
+    isloggedIn
   );
   next();
 };
