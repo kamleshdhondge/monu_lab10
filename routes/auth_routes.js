@@ -58,7 +58,7 @@ router
           .render("register", { error: "Please enter a valid first name." });
       }
     } catch (e) {
-      res
+     return  res
         .status(400)
         .render("register", { error: "Firstname is not entered correctly" });
     }
@@ -76,7 +76,7 @@ router
           .render("register", { error: "Please enter a valid last name." });
       }
     } catch (e) {
-      res
+      return res
         .status(400)
         .render("register", { error: "LastName is not entered correctly" });
     }
@@ -92,7 +92,7 @@ router
           .render("register", { error: "Please enter a valid email" });
       }
     } catch (e) {
-      res
+      return res
         .status(400)
         .render("register", { error: "Email is not entered correctly" });
     }
@@ -111,7 +111,7 @@ router
           .render("register", { error: "Password is not in correct format" });
       }
     } catch (e) {
-      res
+      return res
         .status(400)
         .render("register", { error: "Password is not in correct format" });
     }
@@ -319,7 +319,7 @@ router.route("/protected").get(async (req, res) => {
 
 router.route("/admin").get(async (req, res) => {
   //code here for GET
-  res.render("admin", {
+ return  res.render("admin", {
     firstName: "First Name",
     currentTime: new Date().toLocaleTimeString(),
   });
@@ -340,7 +340,7 @@ router.route("/admin").get(async (req, res) => {
 
 router.route("/error").get(async (req, res) => {
   //code here for GET
-  res.status(500).render("error", { errorMessage: "An error occurred." });
+  return res.status(500).render("error", { errorMessage: "An error occurred." });
 });
 
 router.route("/logout").get(async (req, res) => {
